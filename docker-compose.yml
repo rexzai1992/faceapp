@@ -63,6 +63,10 @@ services:
       GATEWAY_UPLOAD_DIR: face-uploads
       FACE_PUBLIC_BASE_URL: ${FACEAPP_API_ORIGIN}/storage
       GATEWAY_IMAGE_BASE_URL: ${GATEWAY_IMAGE_BASE_URL}
+      # External integration surface — bearer token expected on
+      # /api/external/* endpoints (currently used by qparking-local to open
+      # the turnstile after a paid exit).
+      FACEAPP_EXTERNAL_API_TOKEN: ${FACEAPP_EXTERNAL_API_TOKEN}
     volumes:
       - api_storage:/var/www/html/storage
     depends_on:
