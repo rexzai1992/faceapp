@@ -1,0 +1,16 @@
+# Port-based routing for IP:port deployments (no domains, no TLS).
+# Caddy listens on :80 (frontend) and :8080 (api); the compose override
+# docker-compose.ipports.yml publishes them on host 8090 / 8091.
+# Select with: FACEAPP_CADDYFILE=./infra/caddy/Caddyfile.ipports
+:80 {
+    encode zstd gzip
+    header {
+        Permissions-Policy "camera=(self)"
+    }
+    reverse_proxy frontend:80
+}
+
+:8080 {
+    encode zstd gzip
+    reverse_proxy api:80
+}
