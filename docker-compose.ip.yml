@@ -1,0 +1,19 @@
+# Direct IP:port exposure — no domain, no TLS, no Caddy.
+# Frontend → host 8091, API → host 8090 (match FACEAPP_API_ORIGIN in .env).
+#
+# Run:
+#   docker compose -f docker-compose.yml -f docker-compose.ip.yml up -d --build
+# (add -f infra/face_auth/docker-compose.faceapp-override.yml to also reach face_auth)
+
+services:
+  # Caddy does host/domain routing — not used in IP:port mode, so keep it off.
+  caddy:
+    profiles: ["disabled"]
+
+  frontend:
+    ports:
+      - "8091:80"
+
+  api:
+    ports:
+      - "8090:80"
