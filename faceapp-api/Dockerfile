@@ -26,7 +26,10 @@ COPY --from=build /app /var/www/html
 
 RUN chmod +x /usr/local/bin/faceapp-api-entrypoint \
     && mkdir -p /var/www/html/storage/database \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    # Apache serves as www-data, so the whole app tree must be owned by it.
+    # The composer build stage leaves files root:root 750, which makes Apache
+    # 403 ("unable to read .htaccess" / can't open /config) — chown fixes that.
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 80
