@@ -1,5 +1,13 @@
 # Integrating the external `face_auth` service
 
+> ## Status: WIRED BUT INACTIVE (as of 2026-06-25)
+> The kiosk → Laravel → face_auth path is fully deployed on the VPS
+> (`/api/kiosk/face-checkin/*` and `/api/face-auth/*` are live), but the
+> **face_auth service itself is not running there**, so those endpoints return
+> `502 face_auth_unavailable`. To activate: deploy the face_auth stack, mint a
+> `FACE_AUTH_API_KEY`, and set `FACE_AUTH_DEFAULT_DEVICE_ID`. End-to-end face
+> verification additionally requires a real enrolled Hikvision terminal.
+
 FaceApp consumes [`face_auth`](https://github.com/mhdFitriM/face_auth) as a
 **separate microservice**. None of its code is merged into FaceApp; the Laravel
 API talks to its public `/api/v1` surface server-to-server, holding the API key
