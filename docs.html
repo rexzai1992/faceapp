@@ -1,0 +1,1366 @@
+
+<title>FaceApp — System Documentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0D1117;
+    --surface:   #161B22;
+    --surface2:  #1C2128;
+    --border:    #21262D;
+    --border2:   #30363D;
+    --text:      #E6EDF3;
+    --muted:     #7D8590;
+    --muted2:    #8B949E;
+    --accent:    #58A6FF;
+    --accent-dim:#1F6FEB20;
+    --green:     #3FB950;
+    --green-dim: #238636;
+    --amber:     #D29922;
+    --red:       #F85149;
+    --purple:    #BC8CFF;
+
+    --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, 'Liberation Mono', monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+    --radius: 6px;
+    --transition: 150ms ease;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ---- SIDEBAR ---- */
+  nav {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .nav-brand {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .nav-brand .logo {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-brand .logo-icon {
+    width: 24px; height: 24px;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+  }
+
+  .nav-brand .logo-icon svg {
+    width: 13px; height: 13px;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .nav-brand p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  .nav-group { margin-bottom: 8px; }
+
+  .nav-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 20px 4px;
+    display: block;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 20px;
+    color: var(--muted2);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color var(--transition), background var(--transition);
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--text);
+    background: var(--accent-dim);
+    border-left-color: var(--accent);
+  }
+
+  nav a .dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+
+  /* ---- MAIN CONTENT ---- */
+  main {
+    flex: 1;
+    padding: 48px 56px;
+    max-width: 960px;
+    overflow-x: hidden;
+  }
+
+  /* ---- SECTIONS ---- */
+  section { margin-bottom: 72px; }
+
+  h1 {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    text-wrap: balance;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .page-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .badge-blue  { background: #1F6FEB30; color: var(--accent); border: 1px solid #1F6FEB50; }
+  .badge-green { background: #23863630; color: var(--green);  border: 1px solid #23863650; }
+  .badge-amber { background: #9E640020; color: var(--amber);  border: 1px solid #9E640040; }
+  .badge-purple{ background: #6E40C920; color: var(--purple); border: 1px solid #6E40C940; }
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  h2 .h2-num {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 24px 0 10px;
+  }
+
+  p {
+    color: var(--muted2);
+    max-width: 680px;
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  p strong { color: var(--text); font-weight: 500; }
+
+  /* ---- CODE ---- */
+  pre, code {
+    font-family: var(--font-mono);
+  }
+
+  code {
+    font-size: 12px;
+    background: var(--surface2);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--muted2);
+    font-size: inherit;
+  }
+
+  .kw  { color: var(--purple); }
+  .str { color: var(--green); }
+  .cm  { color: #454C57; }
+  .nu  { color: var(--amber); }
+  .fn  { color: var(--accent); }
+
+  /* ---- TABLES ---- */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: var(--surface2);
+  }
+
+  th {
+    text-align: left;
+    padding: 9px 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted2);
+    vertical-align: top;
+  }
+
+  td code { font-size: 11.5px; }
+
+  tr:last-child td { border-bottom: none; }
+
+  tbody tr:hover { background: #ffffff05; }
+
+  .method {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .method-get  { background: #23863630; color: var(--green); }
+  .method-post { background: #1F6FEB30; color: var(--accent); }
+  .method-put  { background: #9E640030; color: var(--amber); }
+  .method-del  { background: #DA363630; color: var(--red); }
+
+  /* ---- ARCHITECTURE DIAGRAM ---- */
+  .arch {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin: 24px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    align-items: center;
+    overflow-x: auto;
+    min-width: 0;
+  }
+
+  .arch-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .arch-box {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    text-align: center;
+    width: 100%;
+    max-width: 160px;
+  }
+
+  .arch-box .ab-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .arch-box .ab-name {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .arch-box .ab-detail {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .arch-box.accent-border { border-color: var(--accent); }
+  .arch-box.green-border  { border-color: var(--green); }
+  .arch-box.amber-border  { border-color: var(--amber); }
+  .arch-box.purple-border { border-color: var(--purple); }
+
+  .arch-arrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+  }
+
+  .arch-arrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .arrow-line {
+    flex: 1;
+    height: 1px;
+    min-width: 20px;
+    border-top: 1px dashed var(--border2);
+    position: relative;
+  }
+
+  /* ---- STEP LIST ---- */
+  .steps { margin: 16px 0; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: start;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    border: 1px solid #1F6FEB40;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+
+  .step-body h4 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .step-body p { margin-bottom: 8px; }
+
+  /* ---- CARDS ---- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+
+  .card-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-blue   { background: var(--accent); }
+  .dot-green  { background: var(--green); }
+  .dot-amber  { background: var(--amber); }
+  .dot-purple { background: var(--purple); }
+  .dot-red    { background: var(--red); }
+
+  .card p { font-size: 12px; color: var(--muted); margin-bottom: 0; }
+
+  /* ---- ENV TABLE ---- */
+  .env-required { color: var(--red); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+  .env-optional { color: var(--muted); font-family: var(--font-mono); font-size: 10px; }
+
+  /* ---- SCHEMA PILLS ---- */
+  .col-type {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--purple);
+  }
+  .col-pk { color: var(--amber); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+
+  /* ---- CALLOUTS ---- */
+  .callout {
+    border-left: 3px solid var(--amber);
+    background: #9E640010;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 16px;
+    margin: 16px 0;
+  }
+
+  .callout p { color: var(--muted2); margin-bottom: 0; font-size: 13px; }
+  .callout strong { color: var(--amber); }
+
+  .callout.info {
+    border-left-color: var(--accent);
+    background: #1F6FEB10;
+  }
+
+  .callout.info strong { color: var(--accent); }
+
+  /* ---- DIVIDER ---- */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ---- FOCUS ---- */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  @media (max-width: 800px) {
+    nav { display: none; }
+    main { padding: 24px 20px; }
+    .arch { grid-template-columns: 1fr; }
+  }
+</style>
+
+<nav>
+  <div class="nav-brand">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 14 14" aria-hidden="true">
+          <circle cx="7" cy="5" r="2.5" />
+          <path d="M2 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      FaceApp
+    </div>
+    <p>v1.0 — System Docs</p>
+  </div>
+
+  <div class="nav-group">
+    <span class="nav-label">Overview</span>
+    <a href="#overview"><span class="dot"></span>What is FaceApp</a>
+    <a href="#architecture"><span class="dot"></span>Architecture</a>
+    <a href="#stack"><span class="dot"></span>Tech Stack</a>
+  </div>
+
+  <div class="nav-group">
+    <span class="nav-label">Setup</span>
+    <a href="#setup"><span class="dot"></span>Quick Start</a>
+    <a href="#env"><span class="dot"></span>Environment Variables</a>
+    <a href="#database"><span class="dot"></span>Database Schema</a>
+  </div>
+
+  <div class="nav-group">
+    <span class="nav-label">Reference</span>
+    <a href="#api-routes"><span class="dot"></span>API Routes</a>
+    <a href="#admin-routes"><span class="dot"></span>Admin Routes</a>
+    <a href="#services"><span class="dot"></span>Services</a>
+    <a href="#integrations"><span class="dot"></span>External Integrations</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- PAGE HEADER -->
+  <section id="overview">
+    <h1><span>//</span> FaceApp — System Documentation</h1>
+    <div class="page-meta">
+      <span class="badge badge-blue">Laravel 13</span>
+      <span class="badge badge-green">React 19</span>
+      <span class="badge badge-amber">Docker</span>
+      <span class="badge badge-purple">SQLite</span>
+    </div>
+
+    <p>
+      <strong>FaceApp</strong> is a face recognition access control platform. It bridges a React-based enrollment kiosk, a Laravel REST API, and physical biometric access devices through a Java gateway service. Operators manage users and devices via a web admin panel; visitors enroll their face through the kiosk; the gateway syncs face data to hardware and handles door control.
+    </p>
+
+    <p>
+      The system is designed to operate fully on-premise with a reverse-proxied cloud API layer. All services run as Docker containers and communicate over an internal Docker network, with only HTTPS (443), HTTP (80), and device TCP ports (10010, 10011) exposed externally.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-blue"></span>Enrollment Kiosk</div>
+        <p>React SPA with camera capture. Users self-enroll; face data is sent to the API and synced to hardware.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-green"></span>API Backend</div>
+        <p>Laravel 13 REST API. Manages users, devices, enrollments, and gateway communication.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-amber"></span>Gateway SDK</div>
+        <p>Legacy Java service that translates API calls to the proprietary device TCP protocol.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-purple"></span>Admin Panel</div>
+        <p>Laravel-rendered dashboard. Manage devices, users, and system settings.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section id="architecture">
+    <h2><span class="h2-num">01</span> Architecture</h2>
+
+    <p>Three service tiers communicate over an internal Docker bridge network. The Caddy reverse proxy is the only internet-facing ingress for web traffic; device TCP connections bypass Caddy directly.</p>
+
+    <div class="arch">
+      <!-- Column 1: External -->
+      <div class="arch-col">
+        <div class="arch-box accent-border">
+          <div class="ab-label">External</div>
+          <div class="ab-name">Browser</div>
+          <div class="ab-detail">Kiosk / Admin</div>
+        </div>
+        <div class="arch-box" style="border-color:#30363D">
+          <div class="ab-label">External</div>
+          <div class="ab-name">Face Device</div>
+          <div class="ab-detail">TCP :10010</div>
+        </div>
+        <div class="arch-box" style="border-color:#30363D">
+          <div class="ab-label">External</div>
+          <div class="ab-name">qparking</div>
+          <div class="ab-detail">Bearer token API</div>
+        </div>
+      </div>
+
+      <!-- Column 2: arrows -->
+      <div class="arch-arrows" style="flex-direction:column; gap:24px; padding:0 12px;">
+        <div class="arch-arrow">
+          <span>HTTPS :443</span>
+          <div class="arrow-line"></div>
+          <span>▶</span>
+        </div>
+        <div class="arch-arrow">
+          <span>TCP :10010</span>
+          <div class="arrow-line"></div>
+          <span>▶</span>
+        </div>
+        <div class="arch-arrow">
+          <span>HTTPS :443</span>
+          <div class="arrow-line"></div>
+          <span>▶</span>
+        </div>
+      </div>
+
+      <!-- Column 3: Internal services -->
+      <div class="arch-col">
+        <div class="arch-box accent-border">
+          <div class="ab-label">Proxy</div>
+          <div class="ab-name">Caddy</div>
+          <div class="ab-detail">:80 / :443</div>
+        </div>
+        <div class="arch-box green-border">
+          <div class="ab-label">Frontend</div>
+          <div class="ab-name">React SPA</div>
+          <div class="ab-detail">Vite build, served by Caddy</div>
+        </div>
+        <div class="arch-box green-border">
+          <div class="ab-label">API</div>
+          <div class="ab-name">Laravel 13</div>
+          <div class="ab-detail">Apache · :80 internal</div>
+        </div>
+        <div class="arch-box amber-border">
+          <div class="ab-label">Gateway</div>
+          <div class="ab-name">Java SDK</div>
+          <div class="ab-detail">http://gateway:8190</div>
+        </div>
+        <div class="arch-box" style="border-color:#30363D">
+          <div class="ab-label">Storage</div>
+          <div class="ab-name">SQLite</div>
+          <div class="ab-detail">Volume-mounted file</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <p><strong>Network note:</strong> The Laravel API communicates with the Java gateway over the Docker internal network at <code>http://gateway:8190/api</code>. Neither the gateway nor the database is directly reachable from outside Docker.</p>
+    </div>
+
+    <h3>Data Flow — Face Enrollment</h3>
+    <pre><code><span class="cm"># User completes enrollment on the kiosk</span>
+Browser (Camera)
+  → POST /api/enrollments          <span class="cm"># base64 photo + user metadata</span>
+    → FaceEnrollmentService
+      → store photo to disk
+      → GatewaySdkClient.mergeFace()   <span class="cm"># for each active device</span>
+        → Java Gateway HTTP :8190
+          → TCP to physical device :10010
+      → GatewaySdkClient.findFace()    <span class="cm"># verify registration</span>
+      → persist status to DB
+  ← enrollment status JSON</code></pre>
+
+    <h3>Data Flow — Device Callbacks</h3>
+    <pre><code><span class="cm"># Device sends events back to the API (HTTP webhooks)</span>
+Physical Device
+  → POST /api/device/callbacks/heartbeat         <span class="cm"># every 60s</span>
+  → POST /api/device/callbacks/records           <span class="cm"># on access event</span>
+  → POST /api/device/callbacks/person-registrations</code></pre>
+  </section>
+
+  <!-- TECH STACK -->
+  <section id="stack">
+    <h2><span class="h2-num">02</span> Tech Stack</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Technology</th>
+            <th>Version</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Frontend</td>
+            <td><strong>React</strong></td>
+            <td>19.2.4</td>
+            <td>SPA — camera capture, enrollment flow, PWA-enabled</td>
+          </tr>
+          <tr>
+            <td>Frontend build</td>
+            <td><strong>Vite</strong></td>
+            <td>8</td>
+            <td>With <code>vite-plugin-pwa</code> for service worker</td>
+          </tr>
+          <tr>
+            <td>API backend</td>
+            <td><strong>Laravel</strong></td>
+            <td>13.x</td>
+            <td>PHP 8.3+, served by Apache inside Docker</td>
+          </tr>
+          <tr>
+            <td>ORM</td>
+            <td><strong>Eloquent</strong></td>
+            <td>—</td>
+            <td>Laravel native ORM</td>
+          </tr>
+          <tr>
+            <td>Database</td>
+            <td><strong>SQLite</strong></td>
+            <td>3</td>
+            <td>File at <code>/var/www/html/storage/database/database.sqlite</code></td>
+          </tr>
+          <tr>
+            <td>Gateway</td>
+            <td><strong>Java SDK Service</strong></td>
+            <td>2.0.6</td>
+            <td>Legacy binary; communicates with device over TCP; 1 GB heap</td>
+          </tr>
+          <tr>
+            <td>Reverse proxy</td>
+            <td><strong>Caddy</strong></td>
+            <td>2.10</td>
+            <td>Auto-HTTPS, gzip/zstd compression, domain routing</td>
+          </tr>
+          <tr>
+            <td>Containers</td>
+            <td><strong>Docker Compose</strong></td>
+            <td>v2</td>
+            <td>All services in one <code>docker-compose.yml</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- SETUP -->
+  <section id="setup">
+    <h2><span class="h2-num">03</span> Quick Start</h2>
+
+    <p>The entire stack runs via Docker Compose. Before starting, ensure Docker and Docker Compose v2 are installed on the host.</p>
+
+    <div class="callout">
+      <p><strong>Firewall:</strong> Open ports <code>80</code>, <code>443</code>, <code>10010</code> (device TCP), and <code>10011</code> (gateway SDK) on your VPS before proceeding.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Clone the repository and copy the environment file</h4>
+          <pre><code>git clone &lt;repo-url&gt; faceapp-1
+cd faceapp-1
+cp .env.example .env</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Edit <code>.env</code> with your values</h4>
+          <p>At minimum, set your domain names, a fresh Laravel app key, and the gateway device credentials. See the <a href="#env" style="color:var(--accent)">Environment Variables</a> section for all required values.</p>
+          <pre><code>FACEAPP_DOMAIN=faceapp.yourdomain.com
+FACEAPP_API_DOMAIN=faceapp-api.yourdomain.com
+LARAVEL_APP_KEY=base64:&lt;run php artisan key:generate --show&gt;
+GATEWAY_DEVICE_KEY=your_device_key
+GATEWAY_SECRET=your_device_secret</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Point DNS to your VPS public IP</h4>
+          <p>Create <strong>A records</strong> for both <code>FACEAPP_DOMAIN</code> and <code>FACEAPP_API_DOMAIN</code> pointing to the VPS IP. Caddy will automatically provision TLS certificates via ACME once DNS propagates.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Build and start all services</h4>
+          <pre><code>docker compose up -d --build</code></pre>
+          <p>This builds the Laravel image (runs migrations via entrypoint), starts the Java gateway, Caddy proxy, and serves the React build.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Verify services are running</h4>
+          <pre><code>docker compose ps
+docker compose logs -f faceapp-api</code></pre>
+          <p>The health check endpoint <code>GET /api/external/health</code> (with a Bearer token) can be used to confirm the API is responding.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Local Development (Laravel)</h3>
+    <pre><code>cd faceapp-api
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+
+<span class="cm"># Start all dev processes (server, queue, log tail, Vite)</span>
+composer run dev</code></pre>
+
+    <h3>Useful Commands</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Command</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>docker compose up -d --build</code></td><td>Start / rebuild all services</td></tr>
+          <tr><td><code>docker compose down</code></td><td>Stop all services</td></tr>
+          <tr><td><code>docker compose logs -f</code></td><td>Stream all logs</td></tr>
+          <tr><td><code>docker compose exec faceapp-api php artisan migrate</code></td><td>Run database migrations</td></tr>
+          <tr><td><code>docker compose exec faceapp-api php artisan tinker</code></td><td>Laravel REPL</td></tr>
+          <tr><td><code>composer setup</code></td><td>Full local setup (install, key, migrate, build)</td></tr>
+          <tr><td><code>composer test</code></td><td>Run PHPUnit test suite</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ENV VARS -->
+  <section id="env">
+    <h2><span class="h2-num">04</span> Environment Variables</h2>
+    <p>All variables live in the root <code>.env</code> file and are injected into containers via Docker Compose. Copy <code>.env.example</code> and edit before first run.</p>
+
+    <h3>Application</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>COMPOSE_PROJECT_NAME</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Docker Compose project namespace. Default: <code>faceapp-stack</code></td>
+          </tr>
+          <tr>
+            <td><code>FACEAPP_DOMAIN</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Public domain for the React frontend (e.g. <code>faceapp.example.com</code>)</td>
+          </tr>
+          <tr>
+            <td><code>FACEAPP_API_DOMAIN</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Public domain for the Laravel API (e.g. <code>faceapp-api.example.com</code>)</td>
+          </tr>
+          <tr>
+            <td><code>FACEAPP_API_ORIGIN</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Full HTTPS URL of the API, used for CORS. Must match <code>FACEAPP_API_DOMAIN</code></td>
+          </tr>
+          <tr>
+            <td><code>LARAVEL_APP_KEY</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Laravel encryption key. Generate with <code>php artisan key:generate --show</code></td>
+          </tr>
+          <tr>
+            <td><code>LARAVEL_APP_ENV</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td><code>production</code> or <code>local</code>. Default: <code>production</code></td>
+          </tr>
+          <tr>
+            <td><code>LARAVEL_APP_DEBUG</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Set <code>false</code> in production. Exposes stack traces if <code>true</code></td>
+          </tr>
+          <tr>
+            <td><code>FACEAPP_EXTERNAL_API_TOKEN</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Bearer token for the external gate API (used by qparking). Leave empty to disable.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Gateway (Device Communication)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Variable</th><th>Required</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>GATEWAY_DEVICE_KEY</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Device authentication key from the hardware vendor</td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_SECRET</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Device authentication secret from the hardware vendor</td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_IMAGE_BASE_URL</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Plain HTTP base URL the physical device uses to fetch face images. Devices require HTTP (not HTTPS).</td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_CALLBACK_BASE_URL</code></td>
+            <td><span class="env-required">required</span></td>
+            <td>Base URL the device posts heartbeat/access callbacks to</td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_TIMEOUT_SECONDS</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>HTTP timeout for gateway requests. Default: <code>10</code></td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_PERSON_VERIFY_RETRIES</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Retry count for person verification after enrollment. Default: <code>5</code></td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_PERSON_VERIFY_DELAY_MS</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Delay between person verification retries in ms. Default: <code>1000</code></td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_HEARTBEAT_INTERVAL_SECONDS</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Expected device heartbeat interval. Default: <code>60</code></td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_ONLINE_WINDOW_SECONDS</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Seconds since last heartbeat before device is considered offline. Default: <code>180</code></td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_DEVICE_PORT</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>TCP port the device connects on. Default: <code>10010</code></td>
+          </tr>
+          <tr>
+            <td><code>GATEWAY_SDK_PORT</code></td>
+            <td><span class="env-optional">optional</span></td>
+            <td>Internal SDK port. Default: <code>10011</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DATABASE -->
+  <section id="database">
+    <h2><span class="h2-num">05</span> Database Schema</h2>
+    <p>The database is SQLite, stored at <code>/var/www/html/storage/database/database.sqlite</code> inside the container and persisted via a Docker volume. Migrations are run automatically on container start.</p>
+
+    <h3>managed_users</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="col-pk">id</span></td><td class="col-type">bigint</td><td>Primary key</td></tr>
+          <tr><td>public_id</td><td class="col-type">uuid</td><td>Exposed in URLs; never expose internal id</td></tr>
+          <tr><td>employee_id</td><td class="col-type">string</td><td>Human-readable employee identifier</td></tr>
+          <tr><td>name</td><td class="col-type">string</td><td></td></tr>
+          <tr><td>role / department</td><td class="col-type">string?</td><td>Nullable metadata</td></tr>
+          <tr><td>access_level</td><td class="col-type">string?</td><td></td></tr>
+          <tr><td>photo_path / photo_public_url</td><td class="col-type">string?</td><td>Local path + public HTTPS URL</td></tr>
+          <tr><td>person_type / verify_style / ac_group_number</td><td class="col-type">int</td><td>Device behavior settings; defaults from gateway config</td></tr>
+          <tr><td>is_active</td><td class="col-type">boolean</td><td>Deactivated users are not synced to devices</td></tr>
+          <tr><td>last_enrolled_at</td><td class="col-type">timestamp?</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>devices</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="col-pk">id</span></td><td class="col-type">bigint</td><td>Primary key</td></tr>
+          <tr><td>device_key</td><td class="col-type">string</td><td>Hardware vendor device identifier; unique</td></tr>
+          <tr><td>last_ip</td><td class="col-type">string?</td><td>Last known IP of device</td></tr>
+          <tr><td>person_count / face_count</td><td class="col-type">int?</td><td>Reported by heartbeat</td></tr>
+          <tr><td>free_disk_space</td><td class="col-type">bigint?</td><td>In bytes, from heartbeat</td></tr>
+          <tr><td>last_seen_at / last_record_at</td><td class="col-type">timestamp?</td><td></td></tr>
+          <tr><td>secret</td><td class="col-type">string?</td><td>Encrypted; overrides global <code>GATEWAY_SECRET</code> if set</td></tr>
+          <tr><td>is_managed / is_active</td><td class="col-type">boolean</td><td>Only active managed devices receive user syncs</td></tr>
+          <tr><td>display_order</td><td class="col-type">int</td><td>UI ordering</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>enrollments</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="col-pk">id</span></td><td class="col-type">bigint</td><td></td></tr>
+          <tr><td>public_id</td><td class="col-type">uuid</td><td>Exposed in API responses</td></tr>
+          <tr><td>managed_user_id</td><td class="col-type">bigint?</td><td>FK to managed_users; nullable if user not yet matched</td></tr>
+          <tr><td>status</td><td class="col-type">enum</td><td><code>pending</code> → <code>partial</code> → <code>verified</code> | <code>failed</code></td></tr>
+          <tr><td>device_key</td><td class="col-type">string?</td><td>Target device for this enrollment attempt</td></tr>
+          <tr><td>gateway_person_status / gateway_face_status</td><td class="col-type">string?</td><td>Raw status from gateway</td></tr>
+          <tr><td>sync_results</td><td class="col-type">json?</td><td>Per-device enrollment results object</td></tr>
+          <tr><td>error_message</td><td class="col-type">text?</td><td>Human-readable failure reason</td></tr>
+          <tr><td>enrolled_at</td><td class="col-type">timestamp?</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>managed_user_device_syncs</h3>
+    <p>Pivot table tracking per-user, per-device sync state. Used to know which devices have a user's face and whether it verified.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>managed_user_id</td><td class="col-type">bigint</td><td>Composite PK with device_id</td></tr>
+          <tr><td>device_id</td><td class="col-type">bigint</td><td></td></tr>
+          <tr><td>sync_status</td><td class="col-type">enum</td><td><code>synced</code> | <code>failed</code> | <code>deleted</code></td></tr>
+          <tr><td>face_status</td><td class="col-type">enum?</td><td><code>verified</code> | <code>failed</code></td></tr>
+          <tr><td>last_synced_at / last_face_synced_at</td><td class="col-type">timestamp?</td><td></td></tr>
+          <tr><td>last_error_message</td><td class="col-type">text?</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>device_events</h3>
+    <p>Append-only log of all heartbeats, access records, and person registration callbacks from devices.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>device_key</td><td class="col-type">string</td><td></td></tr>
+          <tr><td>event_type</td><td class="col-type">enum</td><td><code>heartbeat</code> | <code>record</code> | <code>person_registration</code></td></tr>
+          <tr><td>event_uid / person_sn / result_flag</td><td class="col-type">string?</td><td>Device-reported identifiers</td></tr>
+          <tr><td>event_time</td><td class="col-type">timestamp</td><td>As reported by device</td></tr>
+          <tr><td>payload</td><td class="col-type">json</td><td>Full raw callback payload for audit</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- API ROUTES -->
+  <section id="api-routes">
+    <h2><span class="h2-num">06</span> API Routes</h2>
+    <p>All API routes are prefixed with <code>/api</code>. Requests should target <code>FACEAPP_API_DOMAIN</code>.</p>
+
+    <h3>Enrollment</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><code>/api/enrollments</code></td>
+            <td>Create a new face enrollment. Accepts base64 photo + user metadata. Triggers sync across all active devices. Returns enrollment object with status.</td>
+          </tr>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><code>/api/enrollments/{public_id}</code></td>
+            <td>Retrieve enrollment status by public UUID. Used to poll enrollment progress.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Frontend Dashboard Data</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><code>/api/app/dashboard</code></td>
+            <td>Returns users, devices, and summary data for the React dashboard view.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Device Status</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><code>/api/device/status</code></td>
+            <td>Returns current status of all registered devices.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Device Callbacks (Webhooks from Hardware)</h3>
+    <p>These endpoints are called by the physical device, not by your application. No authentication required — the device posts raw JSON payloads.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><code>/api/device/callbacks/heartbeat</code></td>
+            <td>Device heartbeat. Updates <code>last_seen_at</code>, person/face counts, disk space.</td>
+          </tr>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><code>/api/device/callbacks/records</code></td>
+            <td>Access event (door open/denied). Logged to <code>device_events</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><code>/api/device/callbacks/person-registrations</code></td>
+            <td>Device-initiated user registration (e.g. card scan on device). Triggers user import flow.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>External Integration API</h3>
+    <p>Authenticated with <code>Authorization: Bearer {FACEAPP_EXTERNAL_API_TOKEN}</code>. Token is validated with <code>hash_equals()</code> to prevent timing attacks.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><code>/api/external/health</code></td>
+            <td><span class="badge badge-blue" style="font-size:10px">Bearer</span></td>
+            <td>Health check. Returns 200 OK if the API is reachable and token is valid.</td>
+          </tr>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><code>/api/external/open-gate</code></td>
+            <td><span class="badge badge-blue" style="font-size:10px">Bearer</span></td>
+            <td>Triggers door/turnstile open command on a specified device. Used by qparking after a paid exit event.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>POST /api/enrollments — Request Body</h3>
+    <pre><code>{
+  <span class="str">"employee_id"</span>: <span class="str">"EMP-001"</span>,
+  <span class="str">"name"</span>:        <span class="str">"Jane Smith"</span>,
+  <span class="str">"photo"</span>:       <span class="str">"data:image/jpeg;base64,/9j/4AAQ..."</span>,  <span class="cm">// base64 data URI</span>
+  <span class="str">"department"</span>:  <span class="str">"Operations"</span>,       <span class="cm">// optional</span>
+  <span class="str">"role"</span>:        <span class="str">"Staff"</span>,             <span class="cm">// optional</span>
+  <span class="str">"device_key"</span>:  <span class="str">"DEVICE-KEY-001"</span>    <span class="cm">// optional; null = all active devices</span>
+}</code></pre>
+  </section>
+
+  <!-- ADMIN ROUTES -->
+  <section id="admin-routes">
+    <h2><span class="h2-num">07</span> Admin Routes</h2>
+    <p>Server-rendered Laravel Blade views. Accessed directly at <code>FACEAPP_API_DOMAIN/admin</code>.</p>
+
+    <h3>Settings</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="method method-get">GET</span></td><td><code>/admin/settings</code></td><td>Edit gateway URLs, retry counts, and timing settings</td></tr>
+          <tr><td><span class="method method-put">PUT</span></td><td><code>/admin/settings</code></td><td>Save system settings to <code>system_settings</code> table</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Devices</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="method method-get">GET</span></td><td><code>/admin/devices</code></td><td>List all managed devices</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices</code></td><td>Register a new device</td></tr>
+          <tr><td><span class="method method-get">GET</span></td><td><code>/admin/devices/{id}/edit</code></td><td>Edit device settings</td></tr>
+          <tr><td><span class="method method-put">PUT</span></td><td><code>/admin/devices/{id}</code></td><td>Update device</td></tr>
+          <tr><td><span class="method method-del">DEL</span></td><td><code>/admin/devices/{id}</code></td><td>Remove device from management</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices/{id}/status</code></td><td>Poll live device status from gateway</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices/{id}/configure-callbacks</code></td><td>Push callback URLs to device</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices/{id}/import-users</code></td><td>Pull existing users from device into the system</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices/{id}/open-door</code></td><td>Remotely open door</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices/{id}/reboot</code></td><td>Reboot device</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/devices/{id}/resync-users</code></td><td>Push all managed users back to the device</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Users</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="method method-get">GET</span></td><td><code>/admin/users</code></td><td>List managed users</td></tr>
+          <tr><td><span class="method method-get">GET</span></td><td><code>/admin/users/create</code></td><td>New user form</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/users</code></td><td>Create user and sync to all active devices</td></tr>
+          <tr><td><span class="method method-get">GET</span></td><td><code>/admin/users/{id}/edit</code></td><td>Edit user</td></tr>
+          <tr><td><span class="method method-put">PUT</span></td><td><code>/admin/users/{id}</code></td><td>Update user and resync</td></tr>
+          <tr><td><span class="method method-del">DEL</span></td><td><code>/admin/users/{id}</code></td><td>Delete user and remove from all devices</td></tr>
+          <tr><td><span class="method method-post">POST</span></td><td><code>/admin/users/{id}/resync</code></td><td>Force re-push user to all active devices</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <h2><span class="h2-num">08</span> Key Services</h2>
+    <p>Business logic lives in <code>faceapp-api/app/Services/</code>. Services are injected via Laravel's container.</p>
+
+    <div class="cards" style="grid-template-columns: 1fr; gap: 12px;">
+
+      <div class="card">
+        <div class="card-title"><span class="dot dot-blue"></span>FaceEnrollmentService</div>
+        <p>Orchestrates the complete enrollment workflow. Extracts the base64 photo, stores it to disk, iterates over all active devices, calls <code>mergeFace()</code> on the gateway, then calls <code>findFace()</code> to verify registration. Tracks per-device status and writes back to the <code>enrollments</code> table. Configurable retry count and delay.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot dot-green"></span>GatewaySdkClient</div>
+        <p>HTTP client for the Java gateway service at <code>http://gateway:8190/api</code>. Wraps all device, person, and face operations. Supports per-device credentials with a fallback to global config. Handles auth failure retries transparently. Key methods: <code>upsertPerson()</code>, <code>mergeFace()</code>, <code>findFace()</code>, <code>output()</code> (open door), <code>reboot()</code>, <code>setServerConfig()</code>.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot dot-amber"></span>ManagedUserSyncService</div>
+        <p>Handles all user-to-device sync operations. <code>syncUserToDevice()</code> upserts a user's person record on a specific device. <code>deleteUserAcrossActiveDevices()</code> removes a user from all hardware. <code>importUsersFromDevice()</code> pulls an existing user list from hardware and creates managed_users records. Updates <code>managed_user_device_syncs</code> with per-device results.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot dot-purple"></span>DeviceMonitoringService</div>
+        <p>Processes inbound webhooks from hardware. <code>recordHeartbeat()</code> updates device online status, person count, face count, and free disk space. <code>recordAccessRecord()</code> logs door access events. <code>recordPersonRegistration()</code> handles device-initiated registrations. All events are appended to <code>device_events</code> for audit.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot dot-red"></span>SystemSettingsService</div>
+        <p>Singleton configuration provider. Reads gateway URLs, callback URLs, retry counts, and timing windows from the <code>system_settings</code> table, with environment variable fallbacks. Consumed by <code>GatewaySdkClient</code> and <code>FaceEnrollmentService</code>. Editable at runtime via <code>/admin/settings</code> without redeploying.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <section id="integrations">
+    <h2><span class="h2-num">09</span> External Integrations</h2>
+
+    <h3>Java Gateway SDK Service (Internal)</h3>
+    <p>A legacy Java 8 binary bundled in the <code>gateway-sdk-service_v2.0.6_20240117/</code> directory. It runs in Docker, listens on three ports, and translates REST calls from Laravel into the proprietary device protocol.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Port</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>8190</code> (internal)</td><td>REST API consumed by Laravel — all device/person/face operations</td></tr>
+          <tr><td><code>10010</code> (external)</td><td>TCP socket the physical device connects to</td></tr>
+          <tr><td><code>10011</code> (external)</td><td>SDK secondary port</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p><strong>Image URL constraint:</strong> Physical devices fetch face images over plain HTTP (not HTTPS). <code>GATEWAY_IMAGE_BASE_URL</code> must be a plain <code>http://</code> URL. The application stores photos at both a public HTTPS URL (for the app) and the HTTP URL (for devices).</p>
+    </div>
+
+    <h3>qparking-local (External)</h3>
+    <p>An external parking management system that calls <code>POST /api/external/open-gate</code> to release a turnstile or gate after a vehicle exit is processed. The integration is authenticated with a shared bearer token set in <code>FACEAPP_EXTERNAL_API_TOKEN</code>.</p>
+
+    <pre><code><span class="cm"># qparking calls this after a paid exit event</span>
+<span class="kw">POST</span> /api/external/open-gate
+Authorization: Bearer {FACEAPP_EXTERNAL_API_TOKEN}
+Content-Type: application/json
+
+{
+  <span class="str">"device_key"</span>: <span class="str">"GATE-001"</span>   <span class="cm">// optional; omit for default device</span>
+}</code></pre>
+
+    <h3>Physical Face Recognition Device</h3>
+    <p>Hardware biometric device from a Chinese OEM vendor. It operates as follows:</p>
+    <div class="steps" style="margin-top:12px;">
+      <div class="step">
+        <div class="step-num" style="width:20px;height:20px;font-size:9px;">→</div>
+        <div class="step-body">
+          <h4>Outbound (Device → System)</h4>
+          <p>Connects to gateway TCP on port 10010. Sends heartbeat every 60s, access records on recognition events, and person registration events when a card is tapped on the device.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="width:20px;height:20px;font-size:9px;">←</div>
+        <div class="step-body">
+          <h4>Inbound (System → Device)</h4>
+          <p>Laravel triggers commands via the Java gateway: add/update/delete persons, enroll faces, open door, reboot, set callback server URL. All routed through <code>GatewaySdkClient</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>

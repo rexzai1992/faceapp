@@ -1,0 +1,77 @@
+# Standalone compose stack for the external face_auth service
+# (github.com/mhdFitriM/face_auth). Run this from its own project directory so
+# it owns its Postgres/Redis/MinIO — FaceApp treats it as a black box.
+#
+#   docker compose -p face_auth -f docker-compose.face_auth.yml up -d
+#
+# It creates a network named "face_auth_default", which the FaceApp api service
+# joins via the `faceauth` external network in the root docker-compose.yml.
+#
+# NOTE: image names / build context / exact env keys come from the face_auth
+# repo's own README — adjust to match. The values below are the integration
+# contract FaceApp depends on: the backend must be reachable at face_auth:8080
+# and expose /api/v1.
+
+services:
+  face_auth:
+    # Either build from the cloned repo…
+    build:
+      context: ../../../face_auth        # path to your local clone of the repo
+    # …or pin a prebuilt image instead:
+    # image: ghcr.io/mhdfitrim/face_auth:latest
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      DATABASE_URL: postgres://faceauth:faceauth@face_auth_db:5432/faceauth?sslmode=disable
+      REDIS_URL: redis://face_auth_redis:6379/0
+      MINIO_ENDPOINT: face_auth_minio:9000
+      MINIO_ACCESS_KEY: faceauth
+      MINIO_SECRET_KEY: faceauth-secret
+      MINIO_BUCKET: faces
+      MINIO_USE_SSL: "false"
+    expose:
+      - "8080"        # internal only; FaceApp reaches it over the docker network
+    ports:
+      - "8080:8080"   # publish to host for direct testing (curl from your laptop)
+    depends_on:
+      - face_auth_db
+      - face_auth_redis
+      - face_auth_minio
+
+  face_auth_db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: faceauth
+      POSTGRES_PASSWORD: faceauth
+      POSTGRES_DB: faceauth
+    volumes:
+      - face_auth_pg:/var/lib/postgresql/data
+
+  face_auth_redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  face_auth_minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: faceauth
+      MINIO_ROOT_PASSWORD: faceauth-secret
+    ports:
+      - "9001:9001"   # MinIO console (optional)
+    volumes:
+      - face_auth_minio:/data
+
+  # Optional: the face_auth React/Vite admin UI. Skip if you manage everything
+  # through the API. It is for managing devices/persons/keys, not for end users.
+  # face_auth_admin:
+  #   build:
+  #     context: ../../../face_auth/admin
+  #   ports:
+  #     - "8090:80"
+
+volumes:
+  face_auth_pg:
+  face_auth_minio:

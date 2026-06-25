@@ -2,10 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import Dashboard from './Dashboard'
 import Camera from './Camera'
 import Preview from './Preview'
+import KioskCheckin from './KioskCheckin'
 import { enrollFace, fetchAppDashboard } from './api'
 import './App.css'
 
-const VIEW = { DASHBOARD: 'dashboard', CAMERA: 'camera', PREVIEW: 'preview' }
+const VIEW = { DASHBOARD: 'dashboard', CAMERA: 'camera', PREVIEW: 'preview', CHECKIN: 'checkin' }
+
+// Identifies this physical kiosk in the check-in audit log. Override per kiosk
+// via the Vite build arg / env; falls back to a single-kiosk default.
+const KIOSK_ID = import.meta.env.VITE_KIOSK_ID || 'kiosk-1'
 
 function extractRunningNumber(value) {
   const digits = String(value || '').replace(/\D/g, '')
@@ -238,6 +243,28 @@ export default function App() {
     }
   }, [activeDevices.length, capturedPhoto, draftUser.employeeId, draftUser.name, loadDashboard, selectedUserId, showToast, user])
 
+  const handleStartCheckin = useCallback(() => {
+    // Check-in needs an identified member (the app's existing "select user"
+    // step). Without one there is nobody to verify against face_auth.
+    if (!selectedUserId || !user) {
+      showToast('Select a member before checking in with face.', 'error')
+      return
+    }
+
+    setView(VIEW.CHECKIN)
+  }, [selectedUserId, user, showToast])
+
+  const handleCheckinResult = useCallback((result) => {
+    if (result?.status === 'granted') {
+      showToast('Access granted.')
+    }
+    // Other outcomes are shown inside the kiosk card; no toast needed.
+  }, [showToast])
+
+  const handleCloseCheckin = useCallback(() => {
+    setView(VIEW.DASHBOARD)
+  }, [])
+
   const handleRetake = useCallback(() => {
     setCapturedPhoto(null)
     setView(VIEW.CAMERA)
@@ -260,6 +287,7 @@ export default function App() {
         refreshing={refreshing}
         onSelectUser={handleSelectUser}
         onOpenCamera={handleOpenCamera}
+        onStartCheckin={handleStartCheckin}
       />
 
       {view === VIEW.CAMERA && (
@@ -275,6 +303,20 @@ export default function App() {
           onSave={handleSave}
           onRetake={handleRetake}
           saving={saving}
+        />
+      )}
+
+      {view === VIEW.CHECKIN && user && (
+        <KioskCheckin
+          kioskId={KIOSK_ID}
+          member={{
+            id: user.id,
+            name: user.name,
+            employeeId: user.employeeId,
+            personId: user.faceId,
+          }}
+          onResult={handleCheckinResult}
+          onClose={handleCloseCheckin}
         />
       )}
 
