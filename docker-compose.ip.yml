@@ -1,5 +1,5 @@
 # Direct IP:port exposure — no domain, no TLS, no Caddy.
-# Frontend → host 8091, API → host 8090 (match FACEAPP_API_ORIGIN in .env).
+# Frontend → host 8090, API → host 8091 (match FACEAPP_API_ORIGIN in .env).
 #
 # Run:
 #   docker compose -f docker-compose.yml -f docker-compose.ip.yml up -d --build
@@ -12,8 +12,8 @@ services:
 
   frontend:
     ports:
-      - "8091:80"
+      - "8090:80"
 
   api:
     ports:
-      - "8090:80"
+      - "8091:80"
