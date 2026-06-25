@@ -1,0 +1,14 @@
+# IP:port exposure THROUGH Caddy (no domains, no TLS) — formalizes the VPS setup.
+#
+# Activate by putting in .env (so plain `docker compose up -d` picks it up):
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.ipports.yml
+#   FACEAPP_CADDYFILE=./infra/caddy/Caddyfile.ipports
+#
+# Caddy listens :80 (frontend) and :8080 (api) per Caddyfile.ipports; published
+# on the host as 8090 (frontend) and 8091 (api). Keeps the working tree clean —
+# no in-place edits to docker-compose.yml / Caddyfile, so `git pull` never conflicts.
+services:
+  caddy:
+    ports: !override
+      - "8090:80"
+      - "8091:8080"
