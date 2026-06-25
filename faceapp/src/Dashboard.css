@@ -203,6 +203,12 @@
   max-width: 280px;
 }
 
+/* Check-in (face verification → turnstile) — distinct from enrolment capture. */
+.checkin-btn {
+  background: linear-gradient(135deg, #1a7f37, #2ea043);
+  border-color: transparent;
+}
+
 .back-btn {
   width: 100%;
   max-width: 280px;

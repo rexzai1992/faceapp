@@ -1,0 +1,62 @@
+.face-verify {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.face-verify__btn {
+  appearance: none;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #1f6feb;
+  color: #fff;
+  transition: background 150ms ease;
+}
+
+.face-verify__btn:hover { background: #1a5fd0; }
+.face-verify__btn:focus-visible { outline: 2px solid #1f6feb; outline-offset: 2px; }
+
+.face-verify__status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.face-verify__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(31, 111, 235, 0.25);
+  border-top-color: #1f6feb;
+  border-radius: 50%;
+  animation: face-verify-spin 0.8s linear infinite;
+}
+
+@keyframes face-verify-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .face-verify__spinner { animation: none; }
+}
+
+.face-verify__msg { font-size: 14px; color: #444; }
+
+.face-verify__cancel {
+  appearance: none;
+  border: 1px solid #ccc;
+  background: transparent;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.face-verify__result { font-size: 14px; font-weight: 600; margin: 0; }
+.face-verify__result--success { color: #1a7f37; }
+.face-verify__result--failed,
+.face-verify__result--error,
+.face-verify__result--timeout { color: #cf222e; }
+.face-verify__result--cancelled { color: #6e7781; }

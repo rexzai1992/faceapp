@@ -1,0 +1,26 @@
+# Opt-in override that joins FaceApp's api container to the face_auth network.
+# Use ONLY when face_auth is running, otherwise the base stack stays untouched.
+#
+#   # 1. start face_auth first (creates the face_auth_default network)
+#   docker compose -p face_auth -f infra/face_auth/docker-compose.face_auth.yml up -d
+#   # 2. start FaceApp WITH this override
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f infra/face_auth/docker-compose.faceapp-override.yml \
+#     up -d
+#
+# Without the override, `docker compose up` works exactly as before — the
+# external network is never required.
+
+services:
+  api:
+    networks:
+      - default
+      - faceauth
+
+networks:
+  faceauth:
+    external: true
+    # Network created by the face_auth compose project (project name "face_auth").
+    # Verify with `docker network ls` and adjust if yours differs.
+    name: face_auth_default

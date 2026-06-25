@@ -67,6 +67,16 @@ services:
       # /api/external/* endpoints (currently used by qparking-local to open
       # the turnstile after a paid exit).
       FACEAPP_EXTERNAL_API_TOKEN: ${FACEAPP_EXTERNAL_API_TOKEN}
+      # External face_auth service. The API key stays server-side (here),
+      # never in the frontend build args.
+      FACE_AUTH_BASE_URL: ${FACE_AUTH_BASE_URL:-}
+      FACE_AUTH_API_KEY: ${FACE_AUTH_API_KEY:-}
+      FACE_AUTH_DEFAULT_DEVICE_ID: ${FACE_AUTH_DEFAULT_DEVICE_ID:-}
+      FACE_AUTH_TIMEOUT_SECONDS: ${FACE_AUTH_TIMEOUT_SECONDS:-10}
+      FACE_AUTH_POLL_MAX_SECONDS: ${FACE_AUTH_POLL_MAX_SECONDS:-60}
+      FACE_AUTH_POLL_INTERVAL_MS: ${FACE_AUTH_POLL_INTERVAL_MS:-1500}
+      FACE_AUTH_GATE_MODE: ${FACE_AUTH_GATE_MODE:-app_turnstile}
+      FACE_AUTH_REQUIRE_MATCHED_IDENTITY: ${FACE_AUTH_REQUIRE_MATCHED_IDENTITY:-true}
     volumes:
       - api_storage:/var/www/html/storage
     depends_on:

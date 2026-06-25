@@ -12,7 +12,10 @@ async function expectJson(response, fallbackMessage) {
   const data = await readJson(response)
 
   if (!response.ok || data.ok === false) {
-    throw new Error(data.error || data.message || fallbackMessage)
+    const error = new Error(data.message || data.error || fallbackMessage)
+    error.code = data.error      // machine-readable code, e.g. 'device_offline'
+    error.status = response.status
+    throw error
   }
 
   return data
@@ -49,4 +52,60 @@ export async function enrollFace(payload) {
   })
 
   return expectJson(response, 'Face enrollment failed.')
+}
+
+// --- face_auth (proxied through our backend; the API key never reaches here) ---
+
+export async function startFaceAuth(payload) {
+  const response = await fetch(buildApiUrl('/api/face-auth/start'), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  return expectJson(response, 'Could not start face verification.')
+}
+
+export async function getFaceAuthSession(sessionId) {
+  const response = await fetch(buildApiUrl(`/api/face-auth/session/${encodeURIComponent(sessionId)}`), {
+    headers: { 'Accept': 'application/json' },
+  })
+
+  return expectJson(response, 'Could not read the verification session.')
+}
+
+export async function cancelFaceAuthSession(sessionId) {
+  const response = await fetch(buildApiUrl(`/api/face-auth/session/${encodeURIComponent(sessionId)}/cancel`), {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' },
+  })
+
+  return expectJson(response, 'Could not cancel the verification session.')
+}
+
+// --- kiosk check-in (face verification → existing turnstile) ---
+
+export async function startKioskFaceCheckin(payload) {
+  const response = await fetch(buildApiUrl('/api/kiosk/face-checkin/start'), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  return expectJson(response, 'Could not start face verification.')
+}
+
+export async function completeKioskFaceCheckin(sessionId) {
+  const response = await fetch(buildApiUrl(`/api/kiosk/face-checkin/${encodeURIComponent(sessionId)}/complete`), {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' },
+  })
+
+  return expectJson(response, 'Could not complete check-in.')
 }

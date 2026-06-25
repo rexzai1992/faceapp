@@ -1,0 +1,108 @@
+.kiosk-checkin {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 20, 0.72);
+  backdrop-filter: blur(6px);
+  padding: 24px;
+}
+
+.kiosk-checkin__card {
+  width: min(440px, 92vw);
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.kiosk-checkin__icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+}
+
+.kiosk-checkin__spinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(31, 111, 235, 0.18);
+  border-top-color: #1f6feb;
+  border-radius: 50%;
+  animation: kiosk-spin 0.9s linear infinite;
+}
+
+@keyframes kiosk-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-checkin__spinner { animation: none; }
+}
+
+.kiosk-checkin__mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.kiosk-checkin__mark--ok  { background: #1a7f37; }
+.kiosk-checkin__mark--bad { background: #cf222e; }
+
+.kiosk-checkin__message {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1c2128;
+}
+
+.kiosk-checkin__card--granted .kiosk-checkin__message { color: #1a7f37; }
+.kiosk-checkin__card--failed .kiosk-checkin__message,
+.kiosk-checkin__card--unavailable .kiosk-checkin__message,
+.kiosk-checkin__card--expired .kiosk-checkin__message { color: #cf222e; }
+
+.kiosk-checkin__member {
+  margin: 0;
+  font-size: 15px;
+  color: #6e7781;
+}
+
+.kiosk-checkin__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.kiosk-checkin__btn {
+  appearance: none;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #1f6feb;
+  color: #fff;
+  transition: background 150ms ease;
+}
+
+.kiosk-checkin__btn:hover { background: #1a5fd0; }
+.kiosk-checkin__btn:focus-visible { outline: 2px solid #1f6feb; outline-offset: 2px; }
+
+.kiosk-checkin__btn--ghost {
+  background: transparent;
+  color: #57606a;
+  border: 1px solid #d0d7de;
+}
+
+.kiosk-checkin__btn--ghost:hover { background: #f3f4f6; }
