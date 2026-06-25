@@ -1,5 +1,8 @@
 # Root repo ignores
 .env
+# Real env files (any dir) — keep the .example templates tracked, never these.
+.env.vps
+.env.local
 .DS_Store
 Thumbs.db
 
